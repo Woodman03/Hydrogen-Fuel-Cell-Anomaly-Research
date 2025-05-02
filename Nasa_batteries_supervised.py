@@ -4,8 +4,6 @@
 #Required Libraries
 import pandas as pd
 import numpy as np
-import researchpy as rp
-import scipy.stats as stats
 import seaborn as sns
 from sklearn.model_selection import RepeatedKFold
 from sklearn.model_selection import cross_val_score
@@ -14,34 +12,16 @@ from sklearn import metrics
 from sklearn.metrics import cohen_kappa_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_curve
-from sklearn.metrics import roc_auc_score
-from matplotlib import pyplot
-from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import QuantileTransformer
-import shap
-import argparse
-import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.naive_bayes import GaussianNB
-
-from numpy.random import seed
-from numpy.random import randn
-from numpy.random import normal
-from scipy.stats import ttest_ind
-from sklearn.model_selection import GridSearchCV
-from sklearn.linear_model import SGDClassifier 
 from sklearn.metrics import roc_curve, auc
-    #Data Preprocessing
+    
 
-from sklearn.ensemble import AdaBoostClassifier
-
-
+#Data Preprocessing
 
 def data_spliting(X,y, test_size = 0.2, smote=True):
     
@@ -195,46 +175,6 @@ def random_forest_classifier(X_train, X_test, y_train, y_test):
             plt.grid(color='black', linestyle='-', linewidth=0.5)
             plt.show()
             
-# ----------------- DA Classifier -----------------
-
-def DA_classifier_10x10(X_train, y_train):
-        from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis 
-        model_DA = QuadraticDiscriminantAnalysis()
-        cv = RepeatedKFold(n_splits=10, random_state=1, n_repeats=10)
-        scores = cross_val_score(model_DA, X, y, scoring='accuracy', cv=cv, n_jobs=-1)
-        
-        print("Mean Accuracy: ",np.mean(scores))
-        
-def DA_classifier(X_train, X_test, y_train, y_test):
-    from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis 
-    model_DA = QuadraticDiscriminantAnalysis()
-    model_DA.fit(X_train, y_train)
-    y_pred = model_DA.predict(X_test)
-    
-    print("Accuracy: ",metrics.accuracy_score(y_test,y_pred))
-    print("area under curve (auc): ", metrics.roc_auc_score(y_test, y_pred))
-    cm,kappa = conf_matrix_cal(y_test,y_pred)
-    confusion_mxtrix (cm)
-    print('Kappa: ', kappa)
-    y_train_pred = model_DA.predict(X_train)   
-    
-    train_fpr, train_tpr, tr_thresholds = roc_curve(y_train, y_train_pred)
-    test_fpr, test_tpr, te_thresholds = roc_curve(y_test, y_pred)
-    
-    roc_auc_train = auc(train_fpr, train_tpr)
-    roc_auc_test = auc(test_fpr, test_tpr)
-    plt.grid()
-    
-    plt.plot(train_fpr, train_tpr, label=' AUC TRAIN = %0.3f' % roc_auc_train)
-    plt.plot(test_fpr, test_tpr, label=" AUC TEST = %0.3f" % roc_auc_test)
-    plt.plot([0,1],[0,1],'g--')
-    plt.legend()
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title("AUC(ROC curve)")
-    plt.grid(color='black', linestyle='-', linewidth=0.5)
-    plt.show()
-#Fit the QDA model
 
 
 # ----------------- SVM -----------------
@@ -295,7 +235,7 @@ def tree_10x10(X_train, y_train):
             scores = cross_val_score(model_tree, X_train, y_train, scoring='balanced_accuracy', cv=cv, n_jobs=-1)
             print("Mean balanced_accuracy: ",np.mean(scores))
             
-        #Support Vector Machine
+       
 def tree(X_train, X_test, y_train, y_test):
             from sklearn.tree import DecisionTreeClassifier        
             model_tree = DecisionTreeClassifier(criterion = 'entropy', random_state = 0)
@@ -324,108 +264,8 @@ def tree(X_train, X_test, y_train, y_test):
             plt.grid(color='black', linestyle='-', linewidth=0.5)
             plt.show()  
             
-# ----------------- IDK -----------------
 
-def Adaboost(X_train, X_test, y_train, y_test):
-            #from sklearn.ensemble import AdaBoostClassifier  
-            model_ada = DecisionTreeClassifier(random_state = 42)
-            model_ada.fit(X_train,y_train)
-            y_pred = model_ada.predict(X_test)
-            print("Accuracy: ",metrics.accuracy_score(y_test,y_pred))
-            print("area under curve (auc): ", metrics.roc_auc_score(y_test, y_pred))
-            cm,kappa = conf_matrix_cal(y_test,y_pred)
-            confusion_mxtrix (cm)
-            print('Kappa: ', kappa)
-            y_train_pred = model_ada.predict(X_train)   
-            
-            train_fpr, train_tpr, tr_thresholds = roc_curve(y_train, y_train_pred)
-            test_fpr, test_tpr, te_thresholds = roc_curve(y_test, y_pred)
-            roc_auc_train = auc(train_fpr, train_tpr)
-            roc_auc_test = auc(test_fpr, test_tpr)
-            plt.grid()
-           
-            plt.plot(train_fpr, train_tpr, label=' AUC TRAIN = %0.3f' % roc_auc_train)
-            plt.plot(test_fpr, test_tpr, label=" AUC TEST = %0.3f" % roc_auc_test)
-            plt.plot([0,1],[0,1],'g--')
-            plt.legend()
-            plt.xlabel("False Positive Rate")
-            plt.ylabel("True Positive Rate")
-            plt.title("AUC(ROC curve)")
-            plt.grid(color='black', linestyle='-', linewidth=0.5)
-            plt.show()   
-def Adaboost_ptimization(X_train, y_train, X_test, y_test):
-  
-  from sklearn.ensemble import AdaBoostClassifier
-  model9 = AdaBoostClassifier()
-  model9.fit(X_train, y_train)
-  print('[9]Adaboost Classifier Training Accuracy:', model9.score(X_train, y_train))
-  y_pred9 = model9.predict(X_test)
-  cm_AdaBoost = confusion_matrix(y_test, y_pred9)
-  print('[9]AdaBoost Classifier Testing Accuracy:', model9.score(X_test,y_test))
-  cm,kappa = conf_matrix_cal(y_test,y_pred)
-  confusion_mxtrix (cm)
-  print('Kappa: ', kappa)
-  weak_learner = DecisionTreeClassifier(max_leaf_nodes=8)
-  for nx in range(50, 1050, 50):
-     model_ada = AdaBoostClassifier(base_estimator=weak_learner,n_estimators=nx, learning_rate=1.0, algorithm='SAMME.R', random_state=42)
-     model_ada.fit(X_train,y_train)
-     print('Training Accuracy:', model_ada.score(X_train, y_train),'Testing Accuracy:', model_ada.score(X_test,y_test), 'n_neighbor:', nx) 
-     #print(' Testing Accuracy:', model_knn.score(X_test,y_test)) 
-  error_uniform = []
-  error_distance = []   
-  k_range = range(50, 1050, 50)
-  for nx in k_range:
-    
-    clf1 = AdaBoostClassifier(base_estimator=weak_learner,n_estimators=nx, learning_rate=1.0, algorithm='SAMME', random_state=42)
-    clf1.fit(X_train, y_train)
-    predictions1 = clf1.predict(X_test)
-    error_uniform.append(1 - accuracy_score(y_test, predictions1))
-    
-    clf2 = AdaBoostClassifier(base_estimator=weak_learner,n_estimators=nx, learning_rate=1.0, algorithm='SAMME.R', random_state=42)
-    clf2.fit(X_train, y_train)
-    predictions2 = clf2.predict(X_test)
-    error_distance.append(1 - accuracy_score(y_test, predictions2))   
-  import plotly.graph_objects as go
-  from sklearn.datasets import make_blobs
-        
-  error_df = pd.DataFrame((zip(k_range, error_uniform, error_distance)),
-               columns =['n_estimators', 'Error_SAMME', 'Error_SAMME.R'])
-    
-  error_fig = go.Figure()
-
-  # error_plots=[go.Scatter(x=error_df['n_estimators'], y=error_df['Error_SAMME'], name='Error_SAMME',line=dict(color='firebrick', width=3)),
-  #               go.Scatter(x=error_df['n_estimators'], y=error_df['Error_SAMME.R'], name='Error_SAMME.R', line=dict(color='royalblue', width=3))]
-    
-  # error_fig = go.Figure(data=error_plots)
-  # error_fig.update_layout(yaxis_range=[0.04,0.09])
-
-  # error_fig.update_layout(height=400, width=900, title_text='<b>Error SAMME vs SAMME.R', title_x=0.5,
-  #                   font_size=14, template='plotly_dark')
-
-  # error_fig.show()
-  plt.grid()
-  
-  plt.plot(error_df['n_estimators'], error_df['Error_SAMME'], label='SAMME')
-  plt.plot(error_df['n_estimators'], error_df['Error_SAMME.R'], label='SAMME.R')
-  
-  
-  plt.legend()
-  plt.xlabel("No of estimators")
-  plt.ylabel("Error rate")
-  plt.title("Error")
-  plt.grid(color='black', linestyle='-', linewidth=0.5)
-  plt.show()
-def AdaBoost_10x10(X_train, y_train):
-          model_ada = AdaBoostClassifier()
-          cv = RepeatedKFold(n_splits=10, random_state=1, n_repeats=1)
-          scores1 = cross_val_score(model_ada, X_train, y_train, scoring='accuracy', cv=cv, n_jobs=-1)
-          scores2 = cross_val_score(model_ada, X_train, y_train, scoring='roc_auc', cv=cv, n_jobs=-1)
-          #print("Mean ROC_AUC: ",np.mean(scores2))
-          scores3 = cross_val_score(model_ada, X_train, y_train, scoring='f1', cv=cv, n_jobs=-1)
-          scores4 = cross_val_score(model_knn,  X_train, y_train, scoring='balanced_accuracy', cv=cv, n_jobs=-1)
-          print("Mean Accuracy: ",np.mean(scores1),"Mean ROC_AUC: ",np.mean(scores2),"Mean F1 score: ",np.mean(scores3),"Mean balanced_accuracy: ",np.mean(scores4))
-
-    
+ # --------- KNN -----------   
 def KNN_ptimization(X_train, y_train, X_test, y_test):
   for nx in range(2, 30, 1):
      model_knn = KNeighborsClassifier(n_neighbors=nx, weights='distance')
@@ -519,47 +359,6 @@ def KNN_10x10(X_train, y_train):
           scores4 = cross_val_score(model_knn,  X_train, y_train, scoring='balanced_accuracy', cv=cv, n_jobs=-1)
           print("Mean Accuracy: ",np.mean(scores1),"Mean ROC_AUC: ",np.mean(scores2),"Mean F1 score: ",np.mean(scores3),"Mean balanced_accuracy: ",np.mean(scores4))
 
-def NB_10x10(X_train, y_train):
-          model_nb = GaussianNB()
-          cv = RepeatedKFold(n_splits=10, random_state=1, n_repeats=1)
-          scores = cross_val_score(model_nb, X_train, y_train, scoring='accuracy', cv=cv, n_jobs=-1)
-          print("Mean Accuracy: ",np.mean(scores))
-
-def Naive_Bayes(X_train, X_test, y_train, y_test):
-    #Calling the Class
-    naive_bayes = GaussianNB()
-    #Fitting the data to the classifier
-    naive_bayes.fit(X_train , y_train)
-    #Predict on test data
-    y_pred = naive_bayes.predict(X_test)
-    for i in range (len(y_pred)):
-       if y_pred[i] < 0.5:
-           y_pred[i] = 0
-       else:
-           y_pred[i] = 1
-    print("Accuracy: ",metrics.accuracy_score(y_test,y_pred))
-    print("area under curve (auc): ", metrics.roc_auc_score(y_test, y_pred))
-    cm,kappa = conf_matrix_cal(y_test,y_pred)
-    confusion_mxtrix (cm)
-    print('Kappa: ', kappa)  
-    y_train_pred = naive_bayes.predict(X_train)   
-    
-    train_fpr, train_tpr, tr_thresholds = roc_curve(y_train, y_train_pred)
-    test_fpr, test_tpr, te_thresholds = roc_curve(y_test, y_pred)
-    roc_auc_train = auc(train_fpr, train_tpr)
-    roc_auc_test = auc(test_fpr, test_tpr)
-    plt.grid()
-    
-    plt.plot(train_fpr, train_tpr, label=' AUC TRAIN = %0.3f' % roc_auc_train)
-    plt.plot(test_fpr, test_tpr, label=" AUC TEST = %0.3f" % roc_auc_test)
-    
-    plt.plot([0,1],[0,1],'g--')
-    plt.legend()
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title("AUC(ROC curve)")
-    plt.grid(color='black', linestyle='-', linewidth=0.5)
-    plt.show()     
 
 
 #SHAP value calculation
